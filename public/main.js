@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const { Notification } = require("electron");
 
 const { autoUpdater } = require("electron-updater");
@@ -17,7 +18,7 @@ function createWindow() {
     minHeight: 650,
     minWidth: 800,
     frame: true,
-    title: "Poke Bingo",
+    title: "Bingo Maker",
     webPreferences: {
       webSecurity: false,
       preload: path.join(__dirname, "/preload.js"),
@@ -30,14 +31,14 @@ function createWindow() {
     ? "http://localhost:3000/"
     : `file://${path.join(__dirname, "../build/index.html")}`;
 
-  if(dev){
-    mainWindow.webContents.openDevTools()
+  if (dev) {
+    mainWindow.webContents.openDevTools();
   }
   mainWindow.loadURL(windowURL);
   mainWindow.removeMenu();
 
   ipcMain.handle("selectDirectory", async function () {
-    let dir = await dialog.showOpenDialog(win, {
+    let dir = await dialog.showOpenDialog(mainWindow, {
       properties: ["openDirectory"],
     });
 
@@ -45,16 +46,25 @@ function createWindow() {
   });
 
   ipcMain.handle("selectFile", async function () {
-    let file = await dialog.showOpenDialog(win, {
+    let file = await dialog.showOpenDialog(mainWindow, {
       properties: ["openFile"],
     });
 
     return file.filePaths[0];
   });
+
+  ipcMain.handle("getFileCount", async function (event, path) {
+    return new Promise((resolve, reject) => {
+      fs.readdir(path, (err, files) => {
+        if (err) reject(err);
+        else resolve(files);
+      });
+    });
+  });
 }
 
 app.whenReady().then(() => {
-  app.setAppUserModelId("Poke Bingo");
+  app.setAppUserModelId("Bingo Maker");
   createWindow();
   setTimeout(() => {
     autoUpdater.checkForUpdates();
