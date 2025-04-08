@@ -4,9 +4,13 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				stext: "#4C4052",
-				mainbg: "#2C2B3E",
-				secondarybg: "#1E1E2E"
+				stext: "#B0B9D1",
+				bg: "#28426B",
+				mainbg: "#172446",
+				sborder: "#94A7CD",
+				accent1: "#F87633",
+				accent2: "#FFC102",
+				accent3: "#01AFCC",
 			}
 		},
 	},
