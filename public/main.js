@@ -36,6 +36,7 @@ function createWindow() {
   }
   mainWindow.loadURL(windowURL);
   mainWindow.removeMenu();
+  mainWindow.setFullScreen(!dev);
 
   ipcMain.handle("selectDirectory", async function () {
     let dir = await dialog.showOpenDialog(mainWindow, {
