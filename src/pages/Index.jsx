@@ -14,7 +14,6 @@ export default function IndexPage() {
 
   function handleTimeChange(event) {
     const time = event.target.value;
-    console.log(time);
     localStorage.setItem("timeForLap", time);
     updateTimeChange(time);
   }
@@ -27,71 +26,66 @@ export default function IndexPage() {
     const fileCount = await getFileCount(dir);
     localStorage.setItem("counter", fileCount.length);
     localStorage.setItem("bingoArray", JSON.stringify(fileCount));
-    console.log(fileCount);
   }
   return (
-    <section className="flex flex-col h-screen justify-center">
-      <div className="h-[500px] w-[500px] mx-auto rounded-lg border border-sborder border-2 bg-mainbg flex flex-col gap-10 justify-around">
-        <h1 className="text-5xl text-white text-center poppins semibold py-8">
-          Bingo Maker
-        </h1>
-        <div>
-          <div className="flex items-center justify-center m-4">
-            <h1 className="w-[100px] rounded-l-lg text-white bg-blue-600 p-2 h-10 indent-2">
-              Folder
-            </h1>
-            <input
-              type="text"
-              readOnly
-              value={folderPath}
-              onClick={handleDirSelection}
-              className="hover:cursor-pointer border text-sm block w-[300px] p-2 h-10  bg-extracontent border-border placeholder-gray-400 text-black hover:bg-extra"
-              placeholder="Options Folder"
-            />
-            <button
-              className="px-5 p-2 h-10  rounded-r-lg bg-blue-600 text-white font-semibold"
-              onClick={() => updateShowModal(!showModal)}
-            >
-              ?
-            </button>
-          </div>
-          <div className="flex items-center justify-center m-4">
-            <h1 className="w-[200px] rounded-l-lg text-white bg-blue-600 p-2 h-10 indent-2">
-              Time Between Card
-            </h1>
-            <input
-              type="number"
-              value={time}
-              onChange={() => handleTimeChange(event)}
-              className="hover:cursor-pointer border text-sm block w-[200px] p-2 h-10  bg-extracontent border-border placeholder-gray-400 text-black hover:bg-extra"
-              placeholder="Time For Lap"
-            />
-            <button
-              className="px-5 p-2 h-10  rounded-r-lg bg-blue-600 text-white font-semibold"
-              onClick={() => updateShowModal(!showModal)}
-            >
-              ?
-            </button>
-          </div>
+    <section className="flex flex-col h-screen justify-end pb-20 bingobg">
+      <div className="w-[600px] mx-auto rounded-lg bg-mainbg flex flex-col gap-10 justify-around">
+        <div className="flex items-center justify-center text-white font-semibold text-shadow-lg/30">
+          <input
+            type="text"
+            readOnly
+            value={folderPath}
+            onClick={handleDirSelection}
+            className="hover:cursor-pointer text-sm block w-full p-2 h-10 bg-extracontent placeholder-black hover:bg-extra  bg-mainbg indent-2 border border-sborder border-2 rounded-l-lg"
+            placeholder="Assets Folder"
+          />
+          <input
+            type="number"
+            value={time}
+            onChange={() => handleTimeChange(event)}
+            className="hover:cursor-pointer text-sm  block w-[110px] p-2 h-10 bg-mainbg placeholder-black text-center indent-4 border-sborder border-y-2"
+            placeholder="Lap Time"
+          />
+          <button
+            className="px-5 p-2 h-10 rounded-r-lg  bg-accent1 border-2 border-accent1hover hover:bg-accent1hover"
+            onClick={() => updateShowModal(!showModal)}
+          >
+            ?
+          </button>
         </div>
+      </div>
 
-        <div className="m-4 flex items-center flex-col">
-          {folderPath == "" ? (
-            <button
-              disabled
-              className="px-10 py-3 bg-gray-400 rounded-lg text-white semibold poppins"
-            >
-              Start
-            </button>
-          ) : (
-            <a
-              className="px-10 py-3 bg-blue-600 rounded-lg text-white semibold poppins hover:bg-blue-500"
-              href="#/counter"
-            >
-              Start
-            </a>
-          )}
-        </div>
+      <div className="m-4 flex items-center flex-row justify-center gap-10">
+        {!folderPath || !time ? (
+          <button
+            disabled
+            className="px-10 py-3 bg-gray-400 rounded-lg text-white semibold poppins"
+          >
+            Start
+          </button>
+        ) : (
+          <a
+            className="px-10 py-3 bg-accent1 rounded-lg text-white semibold poppins hover:bg-accent1hover border-2 border-accent1hover"
+            href="#/counter"
+          >
+            Start
+          </a>
+        )}
+        {folderPath == "" ? (
+          <button
+            disabled
+            className="px-10 py-3 bg-gray-400 rounded-lg text-white semibold poppins"
+          >
+            Create Sheets
+          </button>
+        ) : (
+          <a
+            className="px-10 py-3 bg-accent2  rounded-lg text-white semibold poppins hover:bg-accent2hover  border-2 border-accent2hover"
+            href="#/sheets"
+          >
+            Create Sheets
+          </a>
+        )}
       </div>
       {showModal ? (
         <Modal
