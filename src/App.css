@@ -4,7 +4,7 @@
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -12,30 +12,35 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 
-
 .poppins {
   font-family: "Poppins", sans-serif;
   font-style: normal;
 }
+.bingobg {
+  background-image: url("./assets/bingobg.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
 
+.bingobg2 {
+  background-image: url("./assets/bingobg2.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
 * {
   outline: none;
-  transition: 0.15s linear;
-}
-*:focus {
-  outline: solid 1px #7c8ff6;
-  outline-offset: 2px;
 }
 
-
-.drag{
+.drag {
   -webkit-app-region: drag;
 }
 
-.no-drag{
+.no-drag {
   -webkit-app-region: no-drag;
 }
 
-.root{
+.root {
   transition: none;
 }
