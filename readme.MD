@@ -4,6 +4,7 @@
     [X] => Images based on folder selected
     [] => Create Bingo Sheets
     [] => Detect Winning Sheet
-    [] => Create Menu
+    [X] => Create Menu
     [X] => Options? Auto-Play?
+    [] => Fix menu background
     [] => 
