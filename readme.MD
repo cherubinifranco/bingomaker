@@ -2,9 +2,9 @@
     [] => Update Icons in navbar
     [X] => Add folder selection
     [X] => Images based on folder selected
-    [] => Create Bingo Sheets
-    [] => Detect Winning Sheet
+    [X] => Create Bingo Sheets
+    [X] => Detect Winning Sheet
     [X] => Create Menu
     [X] => Options? Auto-Play?
-    [] => Fix menu background
+    [X] => Fix menu background
     [] => 
