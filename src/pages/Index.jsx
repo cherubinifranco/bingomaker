@@ -36,7 +36,7 @@ export default function IndexPage() {
             readOnly
             value={folderPath}
             onClick={handleDirSelection}
-            className="hover:cursor-pointer text-sm block w-full p-2 h-10 bg-extracontent placeholder-black hover:bg-extra  bg-mainbg indent-2 border border-sborder border-2 rounded-l-lg"
+            className="hover:cursor-pointer text-sm block w-full p-2 h-10 bg-extracontent placeholder-white hover:bg-extra  bg-mainbg indent-2 border border-sborder border-2 rounded-l-lg"
             placeholder="Assets Folder"
           />
           <input
@@ -86,6 +86,11 @@ export default function IndexPage() {
             Create Sheets
           </a>
         )}
+        <a 
+        href="#/configuration"
+        className="px-10 py-3 bg-mainbg rounded-lg text-white semibold poppins border-2 border-accent2hover">
+          Config
+        </a>
       </div>
       {showModal ? (
         <Modal
