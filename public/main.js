@@ -13,10 +13,10 @@ let dev = true;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 650,
-    minHeight: 650,
-    minWidth: 800,
+    width: 1000,
+    height: 900,
+    minHeight: 900,
+    minWidth: 1000,
     frame: true,
     title: "Bingo Maker",
     webPreferences: {
