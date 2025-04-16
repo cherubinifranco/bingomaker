@@ -1,16 +1,16 @@
 {
   "version": "1.2.0",
-  "name": "bean-it",
-  "productName": "Bean It",
+  "name": "bingo-maker",
+  "productName": "Bingo Maker",
   "author": "Franco Cherubini",
-  "description": "App to send automatic emails based on a XLSX file",
+  "description": "App to automatically create bingo sheets and auto select values until a sheet WUnqe45whVou4VIsPew37DoXWNrA",
   "private": true,
-  "repository": "https://github.com/cherubinifranco/beanit",
+  "repository": "https://github.com/cherubinifranco/bingomaker",
   "publish": {
     "provider": "github",
     "private": false,
     "owner": "cherubinifranco",
-    "repo": "beanit",
+    "repo": "bingo-maker",
     "releaseType": "release"
   },
   "scripts": {
@@ -20,8 +20,8 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.beanit",
-    "artifactName": "BeanIT-Setup-${version}.${ext}",
+    "appId": "com.bingomaker",
+    "artifactName": "BingoMaker-Setup-${version}.${ext}",
     "files": [
       "**/*",
       "build"
@@ -41,7 +41,8 @@
     "react-dom": "18.2.0",
     "react-router": "^6.14.1",
     "react-router-dom": "^6.14.1",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "use-sound": "^5.0.0"
   },
   "devDependencies": {
     "electron": "^26.2.1",
