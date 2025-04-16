@@ -1,8 +1,20 @@
 import Modal from "../components/modal";
 import { useEffect, useState } from "react";
 import { getFileCount, getRandomInt } from "../utils";
+import useSound from "use-sound";
+import notification from "../assets/notification.mp3";
 
 export default function CounterPage() {
+  const soundState = JSON.parse(localStorage.getItem("soundState")) ?? true;
+  const trackWinnerState =
+    JSON.parse(localStorage.getItem("trackingState")) ?? false;
+  const lapSound = localStorage.getItem("lapSoundRoute") ?? notification;
+  const restartSound =
+    localStorage.getItem("restartSoundRoute") ?? notification;
+  const winnerSound = localStorage.getItem("winnerSoundRoute") ?? notification;
+  const [playSound] = useSound(lapSound);
+  const [playRestart] = useSound(restartSound);
+  const [playWinner] = useSound(winnerSound);
   const [showModal, updateShowModal] = useState(false);
   const [bingoSheets, updateBingoSheets] = useState(
     JSON.parse(localStorage.getItem("bingoSheets")) ?? []
@@ -57,6 +69,7 @@ export default function CounterPage() {
       updateFilteredList([...bingoArray]);
       updateChosenValue("winnerFound");
       setCurrentTime(0);
+      if (soundState) playWinner();
     }
   }
 
@@ -74,9 +87,12 @@ export default function CounterPage() {
     }
     let cValue = pickValue();
     updateChosenValue(cValue);
-    if (chosenValue != "" && chosenValue !== "winnerFound") {
-      checkIfWinners([...lastValues, chosenValue]);
+    if (trackWinnerState) {
+      if (chosenValue != "" && chosenValue !== "winnerFound") {
+        checkIfWinners([...lastValues, chosenValue]);
+      }
     }
+    if (soundState) playSound();
   }
 
   async function setVariation(pickedValue) {
@@ -95,6 +111,7 @@ export default function CounterPage() {
     const pickedValue = filteredValueList[number];
     if (pickedValue == undefined) {
       restart();
+      if (soundState) playRestart();
       return "";
     }
     setVariation(pickedValue);
@@ -197,7 +214,7 @@ export default function CounterPage() {
         </div>
       </div>
       <h1 className="text-4xl text-center pt-6 text-accent1 poppins font-semibold">
-        {chosenValue!="winnerFound" ? chosenValue : ""}
+        {chosenValue != "winnerFound" ? chosenValue : ""}
       </h1>
       <div className="w-screen flex items-center justify-center flex-wrap">
         {lastValues.slice(0, 10).map((el, index) => (

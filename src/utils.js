@@ -8,6 +8,12 @@ export async function getDir() {
   return folderPath;
 }
 
+export async function getFile() {
+  const filePath = await window.electronAPI.getFile();
+  if (filePath == undefined) return "";
+  return filePath;
+}
+
 export async function getFileCount(path) {
   const fileCount = await window.electronAPI.getFileCount(path);
   return fileCount;
