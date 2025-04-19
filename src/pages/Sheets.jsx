@@ -103,7 +103,7 @@ export default function SheetsPage() {
                 className="bg-mainbg mx-2 rounded-lg p-2"
               >
                 <img
-                  src={"file://" + folder + "/" + x + "/" + x + "-0.png"}
+                  src={"file://" + folder + "/" + x + "/0.png"}
                   alt=""
                   className="w-32  h-32 relative"
                 />
