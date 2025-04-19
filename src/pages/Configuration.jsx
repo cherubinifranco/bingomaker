@@ -37,7 +37,7 @@ export default function ConfigurationPage() {
     let value = await getFile();
     value = value.split(".");
     if (value[1] != "mp3") {
-        alert("Sound Files must be mp3")
+      alert("Sound Files must be mp3");
       value = "";
     }
     if (callback == "lapSoundRoute") {
@@ -69,29 +69,13 @@ export default function ConfigurationPage() {
         <a href="#/">Home</a>
       </div>
       {/* Menu for sheets */}
+      <h1 className="text-4xl text-center pb-10">Configuration</h1>
 
-      <article className="py-4 bg-mainbg rounded-lg m-4">
-        <div className="flex flex-row justify-between items-center pr-8">
-          <label
-            className="inline-block ps-[0.15rem] indent-4 hover:cursor-pointer w-36 text-nowrap pr-4 select-none"
-            htmlFor="soundState"
-          >
-            Play Sounds
-          </label>
-          <div className="h-[1px] bg-slate-700 w-full"></div>
-          <div className="pl-8">
-            <input
-              readOnly
-              className="rounded-lg me-2 mt-[0.3rem] h-3.5 w-8 relative appearance-none rounded-[0.4375rem] before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-accent2 after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-accent1 checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3 checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] bg-white/25 after:bg-surface-dark checked:bg-primary checked:after:bg-primary"
-              type="checkbox"
-              role="switch"
-              id="soundState"
-              onClick={handleSoundState}
-              checked={soundState}
-            />
-          </div>
-        </div>
-      </article>
+      <div className="flex flex-row items-center">
+        <div className="border-t mx-4 border-black h-1 w-[600px]"></div>
+        <h1 className="text-2xl text-center p-2 w-[600px]">General Options</h1>
+        <div className="border-t mx-4 border-black h-1 w-[600px]"></div>
+      </div>
 
       <article className="py-4 bg-mainbg rounded-lg m-4">
         <div className="flex flex-row justify-between items-center pr-8">
@@ -111,6 +95,35 @@ export default function ConfigurationPage() {
               id="trackWinnerState"
               onClick={handleTrackWinnerState}
               checked={trackWinnerState}
+            />
+          </div>
+        </div>
+      </article>
+
+      <div className="flex flex-row items-center">
+        <div className="border-t mx-4 border-black h-1 w-[600px]"></div>
+        <h1 className="text-2xl text-center p-2 w-[600px]">Sound Options</h1>
+        <div className="border-t mx-4 border-black h-1 w-[600px]"></div>
+      </div>
+
+      <article className="py-4 bg-mainbg rounded-lg m-4">
+        <div className="flex flex-row justify-between items-center pr-8">
+          <label
+            className="inline-block ps-[0.15rem] indent-4 hover:cursor-pointer w-36 text-nowrap pr-4 select-none"
+            htmlFor="soundState"
+          >
+            Play Sounds
+          </label>
+          <div className="h-[1px] bg-slate-700 w-full"></div>
+          <div className="pl-8">
+            <input
+              readOnly
+              className="rounded-lg me-2 mt-[0.3rem] h-3.5 w-8 relative appearance-none rounded-[0.4375rem] before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-accent2 after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-accent1 checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3 checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] bg-white/25 after:bg-surface-dark checked:bg-primary checked:after:bg-primary"
+              type="checkbox"
+              role="switch"
+              id="soundState"
+              onClick={handleSoundState}
+              checked={soundState}
             />
           </div>
         </div>
