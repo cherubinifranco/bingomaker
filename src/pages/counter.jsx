@@ -26,7 +26,7 @@ export default function CounterPage() {
   const [lastValues, updateLastValues] = useState([]);
   const [playing, setPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
-  const seconds = localStorage.getItem("timeForLap");
+  const seconds = localStorage.getItem("timeForLap") ?? 5;
   const bingoArray = JSON.parse(localStorage.getItem("bingoArray"));
   const folder = localStorage.getItem("folder");
   useEffect(() => {
@@ -80,6 +80,7 @@ export default function CounterPage() {
   }
 
   function onLap() {
+
     addValue(chosenValue);
     if (filteredValueList.length == 0) {
       restart();
@@ -167,14 +168,13 @@ export default function CounterPage() {
             </h1>
           ) : (
             <img
+              id="cardImage"
               src={
                 "file://" +
                 folder +
                 "/" +
                 chosenValue +
                 "/" +
-                chosenValue +
-                "-" +
                 cardVariation +
                 ".png"
               }
@@ -220,7 +220,7 @@ export default function CounterPage() {
         {lastValues.slice(0, 10).map((el, index) => (
           <div className="w-32 m-4" key={index + "picked"}>
             <img
-              src={"file://" + folder + "/" + el + "/" + el + "-0.png"}
+              src={"file://" + folder + "/" + el + "/" + "0.png"}
               alt=""
               className="w-32  h-32 relative translate-y-[16px]"
             />
@@ -248,7 +248,7 @@ export default function CounterPage() {
             {lastValues.map((el, index) => (
               <div className="w-32 m-4" key={index + "picked"}>
                 <img
-                  src={"file://" + folder + "/" + el + "/" + el + "-0.png"}
+                  src={"file://" + folder + "/" + el + "/" + "0.png"}
                   alt=""
                   className="w-32  h-32 relative translate-y-[16px]"
                 />
