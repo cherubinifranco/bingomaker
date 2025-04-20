@@ -9,7 +9,7 @@ autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
 let mainWindow;
-let dev = true;
+let dev = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -37,6 +37,11 @@ function createWindow() {
   mainWindow.loadURL(windowURL);
   mainWindow.removeMenu();
   mainWindow.setFullScreen(!dev);
+
+
+  ipcMain.on("closeApp", () => {
+    mainWindow.close();
+  });
 
   ipcMain.handle("selectDirectory", async function () {
     let dir = await dialog.showOpenDialog(mainWindow, {
