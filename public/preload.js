@@ -1,5 +1,8 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
+async function exitApp() {
+  ipcRenderer.send("closeApp");
+}
 async function getFolder() {
   return await ipcRenderer.invoke("selectDirectory");
 }
@@ -13,7 +16,8 @@ async function getFileCount(path) {
 let electronBridge = {
   getFolder: getFolder,
   getFile: getFile,
-  getFileCount: getFileCount
+  getFileCount: getFileCount,
+  exitApp: exitApp
 };
 
 
