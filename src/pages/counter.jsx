@@ -1,145 +1,166 @@
-import Modal from "../components/modal";
-import { useEffect, useState } from "react";
-import { getFileCount, getRandomInt } from "../utils";
+import { useEffect, useState, useRef } from "react";
 import useSound from "use-sound";
-import notification from "../assets/notification.mp3";
+import { motion } from "framer-motion";
+
+import Modal from "../components/modal";
+import { getFileCount, getRandomInt } from "../utils";
+
+import notificationSFX from "../assets/notification.mp3";
+import winnerSFX from "../assets/winner.mp3";
+import restartSFX from "../assets/restart.mp3";
+
+const BINGO_STATES = {
+  WINNER: "winnerState",
+  PLAYING: "playingState",
+  RESTART: "restartState",
+};
 
 export default function CounterPage() {
-  const soundState = JSON.parse(localStorage.getItem("soundState")) ?? true;
-  const trackWinnerState =
-    JSON.parse(localStorage.getItem("trackingState")) ?? false;
-  const lapSound = localStorage.getItem("lapSoundRoute") ?? notification;
-  const restartSound =
-    localStorage.getItem("restartSoundRoute") ?? notification;
-  const winnerSound = localStorage.getItem("winnerSoundRoute") ?? notification;
-  const [playSound] = useSound(lapSound);
-  const [playRestart] = useSound(restartSound);
-  const [playWinner] = useSound(winnerSound);
-  const [showModal, updateShowModal] = useState(false);
-  const [bingoSheets, updateBingoSheets] = useState(
-    JSON.parse(localStorage.getItem("bingoSheets")) ?? []
-  );
-  const [winnerSheet, updateWS] = useState();
-  const [filteredValueList, updateFilteredList] = useState([]);
-  const [chosenValue, updateChosenValue] = useState("");
-  const [cardVariation, updateCardVariation] = useState(1);
-  const [lastValues, updateLastValues] = useState([]);
-  const [playing, setPlaying] = useState(true);
+  // Settings & State
+  const [gameState, setGameState] = useState(BINGO_STATES.PLAYING);
+  const bingoSheets = JSON.parse(localStorage.getItem("bingoSheets")) ?? [];
+  const [filteredList, setFilteredList] = useState([]);
+  const [lastValues, setLastValues] = useState([]);
+  const [currentValue, setCurrentValue] = useState("");
+  const [winnerIndex, setWinnerIndex] = useState(null);
+  const [variation, setVariation] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const seconds = localStorage.getItem("timeForLap") ?? 5;
-  const bingoArray = JSON.parse(localStorage.getItem("bingoArray"));
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  // Config from localStorage
+  const seconds = Number(localStorage.getItem("timeForLap")) || 5;
+  const soundEnabled = JSON.parse(localStorage.getItem("soundState")) ?? true;
+  const [trackWinners, setTrackWinners] = useState(JSON.parse(localStorage.getItem("trackingState")) ?? false)
   const folder = localStorage.getItem("folder");
+  const bingoArray = JSON.parse(localStorage.getItem("bingoArray"));
+
+
+  // Security Measure
+  if(bingoSheets == []){
+    setTrackWinners(false)
+  }
+
+
+  // Sounds
+  const [playLap] = useSound(localStorage.getItem("lapSoundRoute") || notificationSFX);
+  const [playRestart] = useSound(localStorage.getItem("restartSoundRoute") || restartSFX);
+  const [playWinner] = useSound(localStorage.getItem("winnerSoundRoute") || winnerSFX);
+  // Animation Config
+  const flipAnimation = {
+    rotateY: 360,
+    scale: [1, 1.4, 1],
+    transition: {
+      rotateY: { duration: 0.6 },
+    },
+  };
+  const defaultAnimation = {
+    rotateY: 0,
+    scale: [1, 1.4, 1],
+    transition: { duration: 0.6 },
+  };
+
+  // Init Game
   useEffect(() => {
-    updateFilteredList(bingoArray);
-    const firstValue = pickValue();
-    updateChosenValue(firstValue);
+    setFilteredList(bingoArray);
+    handleLap();
   }, []);
 
+  // Timer loop
   useEffect(() => {
-    if (!playing) return;
+    if (!isPlaying) return;
 
     const timer = setInterval(() => {
       setCurrentTime((prev) => {
         const updated = prev + 0.1;
-
-        if (updated > seconds) {
-          onLap();
-          return -0.1;
+        if (updated >= seconds) {
+          handleLap();
+          return 0;
         }
         return updated;
       });
     }, 100);
 
     return () => clearInterval(timer);
-  }, [playing, chosenValue, filteredValueList]);
+  }, [isPlaying, currentValue, filteredList]);
 
-  function includesAll(arr, values) {
-    return values.every((v) => arr.includes(v));
-  }
-  function checkIfWinners(allValuesArr) {
-    let winner = false;
-    for (let i = 0; i < bingoSheets.length; i++) {
-      const res = includesAll(allValuesArr, bingoSheets[i]);
-      if (res) {
-        winner = true;
-        updateWS(i);
-      }
-    }
-    if (winner) {
-      updateFilteredList([...bingoArray]);
-      updateChosenValue("winnerFound");
-      setCurrentTime(0);
-      if (soundState) playWinner();
-    }
-  }
-
-  function restart() {
-    updateFilteredList([...bingoArray]);
-    updateChosenValue("");
-    setCurrentTime(0);
-  }
-
-  function onLap() {
-
-    addValue(chosenValue);
-    if (filteredValueList.length == 0) {
-      restart();
+  const handleLap = () => {
+    addToLastValues(currentValue);
+    playSFX();
+    if (gameState == BINGO_STATES.WINNER) {
+      setCurrentValue("winnerFound");
+      setGameState(BINGO_STATES.RESTART);
       return;
-    }
-    let cValue = pickValue();
-    updateChosenValue(cValue);
-    if (trackWinnerState) {
-      if (chosenValue != "" && chosenValue !== "winnerFound") {
-        checkIfWinners([...lastValues, chosenValue]);
-      }
-    }
-    if (soundState) playSound();
-  }
-
-  async function setVariation(pickedValue) {
-    const cardVariationSelection = await getFileCount(
-      folder + "/" + pickedValue
-    );
-    if (cardVariationSelection.length == 1) {
-      updateCardVariation(0);
+    } else if (gameState == BINGO_STATES.RESTART) {
+      resetGame();
+      return;
     } else {
-      const number = getRandomInt(1, cardVariationSelection.length - 1);
-      updateCardVariation(number);
+      setIsFlipped((prev) => !prev);
+
+      if (filteredList.length === 0) return resetGame();
+
+      const next = selectNextValue(filteredList);
+      setCurrentValue(next);
+
+      if (trackWinners && next) {
+        checkForWinners([...lastValues, currentValue, next]);
+      }
     }
-  }
-  function pickValue() {
-    const number = getRandomInt(0, filteredValueList.length);
-    const pickedValue = filteredValueList[number];
-    if (pickedValue == undefined) {
-      restart();
-      if (soundState) playRestart();
-      return "";
+  };
+
+  const checkForWinners = (values) => {
+    bingoSheets.forEach((sheet, index) => {
+      const isWinner = sheet.every((val) => values.includes(val));
+      if (isWinner) {
+        setGameState(BINGO_STATES.WINNER);
+        setWinnerIndex(index);
+      }
+    });
+  };
+
+  const setCardVariation = async (value) => {
+    const options = await getFileCount(`${folder}/${value}`);
+    setVariation(options.length <= 1 ? 0 : getRandomInt(1, options.length - 1));
+  };
+
+  const addToLastValues = (value) => {
+    if (!value || value === "winnerFound") return;
+    setLastValues((prev) => [value, ...prev]);
+  };
+
+  const resetGame = () => {
+    setFilteredList([...bingoArray]);
+    setCurrentValue("");
+    setCurrentTime(0);
+    setLastValues([]);
+    setGameState(BINGO_STATES.PLAYING);
+    if (soundEnabled) playRestart();
+  };
+
+  function playSFX() {
+    if (gameState == BINGO_STATES.WINNER) {
+      playWinner();
+    } else if (gameState == BINGO_STATES.RESTART) {
+      playRestart();
+    } else {
+      playLap();
     }
-    setVariation(pickedValue);
-    updateFilteredList(
-      filteredValueList
-        .slice(0, number)
-        .concat(filteredValueList.slice(number + 1))
-    );
-    return pickedValue;
   }
 
-  function addValue(value) {
-    if (value == "") {
-      updateLastValues([]);
-      return;
-    }
-    if (value == "winnerFound") {
-      updateLastValues([]);
-      return;
-    }
-    let newArray = [...lastValues];
-    newArray.unshift(value);
-    updateLastValues(newArray);
-  }
+  const selectNextValue = (list) => {
+    const index = getRandomInt(0, list.length);
+    const value = list[index];
+    if (!value) return "";
+
+    setCardVariation(value);
+    const newList = list.filter((_, i) => i !== index);
+    setFilteredList(newList);
+    return value;
+  };
 
   const togglePlay = () => {
-    setPlaying((prev) => !prev);
+    setIsPlaying((prev) => !prev);
   };
 
   return (
@@ -150,38 +171,17 @@ export default function CounterPage() {
           Home{" "}
         </a>
         <button onClick={togglePlay} className="px-4">
-          {playing ? "Pause" : "Play"}
+          {isPlaying ? "Pause" : "Play"}
         </button>
-        <button onClick={restart} className="px-4">
+        <button onClick={resetGame} className="px-4">
           Reset
         </button>
       </div>
       <div className="h-[440px] w-[440px] border border-4 border-accent1 rounded-full flex items-center justify-center mx-auto bg-mainbg cursor-pointer">
         <div className="flex items-center justify-center w-96 h-96">
-          {chosenValue == "" ? (
-            <h1 className="text-2xl text-accent1 text-wrap text-center font-semibold">
-              New Game Starting Soon
-            </h1>
-          ) : chosenValue == "winnerFound" ? (
-            <h1 className="text-2xl text-accent1 text-wrap text-center font-semibold">
-              Winner Found: Sheet {winnerSheet + 1}
-            </h1>
-          ) : (
-            <img
-              id="cardImage"
-              src={
-                "file://" +
-                folder +
-                "/" +
-                chosenValue +
-                "/" +
-                cardVariation +
-                ".png"
-              }
-              className="h-80 w-80 rounded-full object-cover rotate-x-15 -rotate-y-30 z-50"
-              alt=""
-            />
-          )}
+          <motion.div animate={isFlipped ? flipAnimation : defaultAnimation} className="relative w-96 h-96 cursor-pointer flex items-center justify-center " style={{ transformStyle: "preserve-3d" }}>
+            {currentValue == "" ? <h1 className="text-2xl text-accent1 text-wrap text-center font-semibold">New Game Starting Soon</h1> : currentValue == "winnerFound" ? <h1 className="text-2xl text-accent1 text-wrap text-center font-semibold">Winner Found: Sheet {winnerIndex + 1}</h1> : <img id="cardImage" src={"file://" + folder + "/" + currentValue + "/" + variation + ".png"} className="h-80 w-80 rounded-full object-cover rotate-x-15 -rotate-y-30 z-50" alt="" />}
+          </motion.div>
 
           {/* Lines around the center */}
           <div className="absolute w-96 h-96 z-40  rounded-full">
@@ -199,43 +199,22 @@ export default function CounterPage() {
 
           {/* Timer line */}
           <svg className="absolute w-96 h-96 rotate-[-90deg]">
-            <circle
-              cx="192"
-              cy="192"
-              r="180"
-              stroke="currentColor"
-              strokeWidth="20"
-              fill="transparent"
-              strokeDasharray="1131"
-              strokeDashoffset={1131 - (1131 / seconds) * currentTime}
-              className="text-accent2 opacity-50"
-            />
+            <circle cx="192" cy="192" r="180" stroke="currentColor" strokeWidth="20" fill="transparent" strokeDasharray="1131" strokeDashoffset={1131 - (1131 / seconds) * currentTime} className="text-accent2 opacity-50" />
           </svg>
         </div>
       </div>
-      <h1 className="text-4xl text-center pt-6 text-accent1 poppins font-semibold">
-        {chosenValue != "winnerFound" ? chosenValue : ""}
-      </h1>
+      <h1 className="text-4xl text-center pt-6 text-accent1 poppins font-semibold">{currentValue != "winnerFound" ? currentValue : ""}</h1>
       <div className="w-screen flex items-center justify-center flex-wrap">
         {lastValues.slice(0, 10).map((el, index) => (
           <div className="w-32 m-4" key={index + "picked"}>
-            <img
-              src={"file://" + folder + "/" + el + "/" + "0.png"}
-              alt=""
-              className="w-32  h-32 relative translate-y-[16px]"
-            />
-            <h1 className="text-center text-black font-semibold poppins pt-6 pb-2 bg-mainbg rounded-b-lg border-2 border-accent1">
-              {el}
-            </h1>
+            <img src={"file://" + folder + "/" + el + "/" + "0.png"} alt="" className="w-32  h-32 relative translate-y-[16px]" />
+            <h1 className="text-center text-black font-semibold poppins pt-6 pb-2 bg-mainbg rounded-b-lg border-2 border-accent1">{el}</h1>
           </div>
         ))}
       </div>
       <div className="flex justify-center">
-        {lastValues.length > 9 ? (
-          <button
-            className="py-2 px-4 bg-accent1 rounded-lg text-white"
-            onClick={() => updateShowModal(!showModal)}
-          >
+        {lastValues.length > 6 ? (
+          <button className="py-2 px-4 bg-accent1 rounded-lg text-white" onClick={() => setShowModal(!showModal)}>
             See Full List
           </button>
         ) : (
@@ -243,18 +222,12 @@ export default function CounterPage() {
         )}
       </div>
       {showModal ? (
-        <Modal title="All selected cards" note="" onExit={updateShowModal}>
+        <Modal title="All selected cards" note="" onExit={setShowModal}>
           <div className="flex flex-row flex-wrap gap-4 justify-center">
             {lastValues.map((el, index) => (
               <div className="w-32 m-4" key={index + "picked"}>
-                <img
-                  src={"file://" + folder + "/" + el + "/" + "0.png"}
-                  alt=""
-                  className="w-32  h-32 relative translate-y-[16px]"
-                />
-                <h1 className="text-center text-black font-semibold poppins pt-6 pb-2 bg-mainbg rounded-b-lg border-2 border-accent1">
-                  {el}
-                </h1>
+                <img src={"file://" + folder + "/" + el + "/" + "0.png"} alt="" className="w-32  h-32 relative translate-y-[16px]" />
+                <h1 className="text-center text-black font-semibold poppins pt-6 pb-2 bg-mainbg rounded-b-lg border-2 border-accent1">{el}</h1>
               </div>
             ))}
           </div>
